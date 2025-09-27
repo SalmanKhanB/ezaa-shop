@@ -20,7 +20,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // Get all categories
 export const useCategories = (userId?: number) =>
+export const useCategories = (userId?: number) =>
   useQuery({
+    queryKey: ["categories", userId],
+    queryFn: userId ? getCategories : getCategoriesPublic,
     queryKey: ["categories", userId],
     queryFn: userId ? getCategories : getCategoriesPublic,
   });
@@ -112,8 +115,11 @@ export const useAddReview = () => {
 
 // Get popular products for user (or public if not logged in)
 export const usePopularProducts = (userId?: number) =>
+// Get popular products for user (or public if not logged in)
+export const usePopularProducts = (userId?: number) =>
   useQuery({
     queryKey: ["popularProducts", userId],
+    queryFn: userId && userId !== -1 ? () => getPopularProducts(userId) : getPopularProductsPublic,
     queryFn: userId && userId !== -1 ? () => getPopularProducts(userId) : getPopularProductsPublic,
   });
 

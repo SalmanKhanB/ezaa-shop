@@ -1,4 +1,5 @@
 "use client";
+"use client";
 import Categories from "@/components/categories";
 import Container from "@/components/container";
 import Hero from "@/components/hero";
@@ -13,10 +14,12 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 
 const HomePage = () => {
   const isMobile = useIsMobile();
+  const isMobile = useIsMobile();
   return (
     <Container>
       <Hero />
       <Categories />
+      {!isMobile && <SocialText />}
       {!isMobile && <SocialText />}
       <Subcategories />
       <Products showViewAll={true} />

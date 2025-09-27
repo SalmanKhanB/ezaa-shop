@@ -8,6 +8,7 @@ import { useProduct } from "@/hooks/useProducts";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { addProduct } from "@/lib/store/slices/cartSlice";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
+import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { PhotoProvider } from "react-photo-view";
 import { toast } from "sonner";
@@ -18,13 +19,19 @@ import Loader from "./loader";
 import RichText from "./rich-text";
 import { useReferralCode } from "@/hooks/useReferral";
 import { RiShoppingBag3Fill} from "react-icons/ri";
+import { RiShoppingBag3Fill} from "react-icons/ri";
 
 const ProductDetails = ({ id }: { id: number }) => {
   const { userId } = useAppSelector((store) => store.auth);
   const { data: referralData } = useReferralCode(userId || 0);
   const { pendingReferralCode } = useAppSelector((store) => store.referral);
+  const { pendingReferralCode } = useAppSelector((store) => store.referral);
 
   const currentUrl = window.location.href;
+  const userReferralCode = referralData?.data?.userReferalCode?.code || "------";
+  
+  // Use user's referral code if they're signed in, otherwise use pending referral code
+  const referralCode = userId ? userReferralCode : (pendingReferralCode || "------");
   const userReferralCode = referralData?.data?.userReferalCode?.code || "------";
   
   // Use user's referral code if they're signed in, otherwise use pending referral code
@@ -40,6 +47,7 @@ const ProductDetails = ({ id }: { id: number }) => {
 
   const { data, isLoading, isError, error } = useProduct(
     id,
+    userId || -1
     userId || -1
   );
   const [quantity, setQuantity] = useState(1);
@@ -111,6 +119,7 @@ const ProductDetails = ({ id }: { id: number }) => {
         category_name: product.category?.name,
         image: product.product_image[0].image,
         quantity: 1,
+        price: parseFloat(product.product_deatils[0].price),
         price: parseFloat(product.product_deatils[0].price),
         selling_price: parseFloat(product.product_deatils[0].selling_price),
         sub_total: parseFloat(product.product_deatils[0].selling_price),
@@ -191,9 +200,14 @@ const ProductDetails = ({ id }: { id: number }) => {
                 PKR {product.product_deatils[0]?.price}
               </span> */}
               {/* <Badge variant="destructive">Save {discount}%</Badge> */}
+              {/* <span className="text-gray-400 line-through">
+                PKR {product.product_deatils[0]?.price}
+              </span> */}
+              {/* <Badge variant="destructive">Save {discount}%</Badge> */}
             </div>
 
             <div className="flex items-center gap-4 mt-4">
+              <span className="text-green-600 text-sm">100% Cashback</span>
               <span className="text-green-600 text-sm">100% Cashback</span>
               <span className="text-green-600 text-sm">In Stock</span>
             </div>
@@ -225,8 +239,10 @@ const ProductDetails = ({ id }: { id: number }) => {
               <Button
                 variant="signature"
                 className="w-full sm:w-5/11"
+                className="w-full sm:w-5/11"
                 onClick={handleAddToCart}
               >
+                <ShoppingCart size={16} className="mr-2" />
                 <ShoppingCart size={16} className="mr-2" />
                 Add to Cart
               </Button>

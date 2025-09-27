@@ -15,6 +15,16 @@ import Loader from "@/components/loader";
 import Head from "next/head";
 
 const inter = Inter({ subsets: ["latin"] });
+import { Inter } from "next/font/google";
+import StoreProvider from "@/lib/store/StoreProvider";
+import { ThemeProvider } from "@/components/theme-provider";
+import ReferralHandler from "@/components/referral-handler";
+import ReferralNotification from "@/components/referral-notification";
+import { Suspense } from "react";
+import Loader from "@/components/loader";
+import Head from "next/head";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Ezaa Shop",

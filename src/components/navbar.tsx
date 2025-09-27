@@ -45,6 +45,7 @@ const Navbar = () => {
       transition={{ duration: 0.3 }}
     >
       <Container className="w-full flex items-center py-2">
+      <Container className="w-full flex items-center py-2">
         <div className="flex-1 flex justify-start items-center">
           <Brand />
           {auth && (
@@ -201,6 +202,37 @@ const ActionButtons = () => {
       </div>
      
     </div>
+  );
+};
+
+// Icon components with active state styling
+const HomeIcon = () => {
+  const pathname = usePathname();
+  const isActive = pathname === "/";
+  return (
+    <svg className={`w-5 h-5 transition-colors ${isActive ? 'text-signature' : 'text-foreground group-hover:text-signature'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+    </svg>
+  );
+};
+
+const AboutIcon = () => {
+  const pathname = usePathname();
+  const isActive = pathname === "/about";
+  return (
+    <svg className={`w-5 h-5 transition-colors ${isActive ? 'text-signature' : 'text-foreground group-hover:text-signature'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
+};
+
+const ContactIcon = () => {
+  const pathname = usePathname();
+  const isActive = pathname === "/contact-us";
+  return (
+    <svg className={`w-5 h-5 transition-colors ${isActive ? 'text-signature' : 'text-foreground group-hover:text-signature'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
   );
 };
 

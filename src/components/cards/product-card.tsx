@@ -1,5 +1,6 @@
 "use client";
 import { ShoppingCart } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -9,17 +10,26 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { addProduct } from "@/lib/store/slices/cartSlice";
 import { Product } from "@/types";
 import { toast } from "sonner";
 import Favorite from "../favorite";
 import MyImage from "../my-image";
 import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export const ProductCard = ({ product }: { product: Product }) => {
   const { id, product_image, name, product_deatils } = product;
   const { selling_price } = product_deatils[0] || {};
+  const { selling_price } = product_deatils[0] || {};
   const dispatch = useAppDispatch();
+  const { token, userId } = useAppSelector((store) => store.auth);
+  const { pendingReferralCode } = useAppSelector((store) => store.referral);
+  const router = useRouter();
+
+  // Use -1 as default userId for product detail fetching if user is not registered
+  const effectiveUserId = userId || -1;
   const { token, userId } = useAppSelector((store) => store.auth);
   const { pendingReferralCode } = useAppSelector((store) => store.referral);
   const router = useRouter();
@@ -36,7 +46,14 @@ export const ProductCard = ({ product }: { product: Product }) => {
       router.push(loginUrl);
       return;
     }
+    if (!token || !userId) {
+      let loginUrl = "/auth/login";
+      if (pendingReferralCode) loginUrl += `?referralCode=${pendingReferralCode}`;
+      router.push(loginUrl);
+      return;
+    }
 
+    if (!id || !selling_price) return;
     if (!id || !selling_price) return;
 
     dispatch(
@@ -46,6 +63,8 @@ export const ProductCard = ({ product }: { product: Product }) => {
         category_name: product.category?.name,
         image: product.product_image[0].image,
         quantity: 1,
+         selling_price: parseFloat(product.product_deatils[0].selling_price),
+         price: parseFloat(product.product_deatils[0].price),
          selling_price: parseFloat(product.product_deatils[0].selling_price),
          price: parseFloat(product.product_deatils[0].price),
         sub_total: parseFloat(product.product_deatils[0].selling_price),

@@ -1,4 +1,5 @@
 "use client";
+"use client";
 import {
   Carousel,
   CarouselContent,
@@ -12,6 +13,8 @@ import getImageUrl from "@/utils/getImageUrl";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Banner from "../../public/images/banner.png";
+import Banner2 from "../../public/images/banner2.jpg";
+import { useState, useEffect } from "react";
 
 const Hero = () => {
   const { data, isLoading, isError } = useBanners();
@@ -51,6 +54,13 @@ const Hero = () => {
   }
 
   return (
+    <div className="relative w-full rounded-2xl shadow-xl overflow-hidden mt-4">
+      <Carousel
+        autoplay={true}
+        delay={3000}
+        setApi={setCarouselApi}
+        className="rounded-2xl"
+      >
     <div className="relative w-full rounded-2xl shadow-xl overflow-hidden mt-4">
       <Carousel
         autoplay={true}

@@ -113,6 +113,7 @@ const Categories = () => {
         className="w-full"
       >
         <CarouselContent className="px-3">
+        <CarouselContent className="px-3">
           {categories.data.categories.map((category: Category) => (
             <CarouselItem
               key={category.id}

@@ -54,6 +54,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname === route || pathname?.startsWith(route + "/"));
 
     if (!isAuthenticated && !isAuthRoute && !isPublicRoute) {
+    if (!isAuthenticated && !isAuthRoute && !isPublicRoute) {
       setHasRedirected(true);
       router.replace("/auth/login");
     }
