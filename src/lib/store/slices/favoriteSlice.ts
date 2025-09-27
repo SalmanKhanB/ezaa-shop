@@ -6,7 +6,7 @@ interface FavoriteProduct {
     id: number;
     product_image: { image: string; cover_status: number }[];
     name: string;
-    product_deatils: { price?: string; selling_price?: string }[];
+    product_deatils: { selling_price?: string }[];
   };
 }
 

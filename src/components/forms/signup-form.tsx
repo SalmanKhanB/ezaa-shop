@@ -5,29 +5,34 @@ import { Signup } from "@/types";
 import { SignupSchema } from "@/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaUser, FaPhone } from "react-icons/fa";
+import { FaPhone, FaUser } from "react-icons/fa";
 import { MdAlternateEmail } from "react-icons/md";
 import { RiUserSharedLine } from "react-icons/ri";
-import Loader from "../loader";
+import { toast } from "sonner";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
+import Loader from "../loader";
 import PasswordInput from "./fields/password-input";
 import TextInput from "./fields/text-input";
-import { useSearchParams } from "next/navigation";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useAppSelector } from "@/lib/store/hooks";
 
 const SignupForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const referralCode = searchParams.get("referralCode");
+  const urlReferralCode = searchParams.get("referralCode");
+  const { pendingReferralCode, sourceUrl } = useAppSelector((store) => store.referral);
+  
+  // Use referral code from URL first, then from store
+  const referralCode = urlReferralCode || pendingReferralCode || "";
+  
   const {
     control,
     handleSubmit,
     formState: { isSubmitting },
     reset,
+    setValue,
   } = useForm<Signup>({
     resolver: zodResolver(SignupSchema),
     defaultValues: {
@@ -36,13 +41,20 @@ const SignupForm = () => {
       email: "",
       phone: "",
       password: "",
-      referal_code: referralCode || "",
+      referal_code: "",
     },
   });
 
   const { mutate: register, isPending } = useRegister();
   const [isTermsChecked, setIsTermsChecked] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Set referral code when component mounts or referral code changes
+  useEffect(() => {
+    if (referralCode) {
+      setValue("referal_code", referralCode);
+    }
+  }, [referralCode, setValue]);
 
   const onSubmit = async (data: Signup) => {
     try {
@@ -107,11 +119,11 @@ const SignupForm = () => {
           name="referal_code"
           placeholder="Enter referral code (optional)"
           control={control}
-          icon={<RiUserSharedLine />} // or any icon or none
+          icon={<RiUserSharedLine />}
         />
 
         <div className="flex items-center justify-end gap-2">
-          <Input
+          <input
             type="checkbox"
             name="terms"
             className="w-4 h-4"

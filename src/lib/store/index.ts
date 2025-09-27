@@ -8,6 +8,7 @@ import appDataReducer from "./slices/appDataSlice";
 import bankAccountReducer from "./slices/bankAccountSlice";
 import notificationsReducer from "./slices/notificationSlice";
 import cashbackReducer from "./slices/cashbackSlice";
+import referralReducer from "./slices/referralSlice";
 
 const store = configureStore({
   reducer: {
@@ -19,6 +20,7 @@ const store = configureStore({
     appData: appDataReducer,
     notifications: notificationsReducer,
     cashback: cashbackReducer,
+    referral: referralReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

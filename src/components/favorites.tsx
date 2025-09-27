@@ -1,12 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { BsHeartFill } from "react-icons/bs";
+import { usePathname } from "next/navigation";
+
 const Favorites = () => {
+  const pathname = usePathname();
+  const isActive = pathname === "/favorites";
+  
   return (
-    <Link href="/favorites">
-      <BsHeartFill className="tex cursor-pointer size-6" />
-    </Link>
+    <BsHeartFill className={`transition-colors size-5 ${isActive ? 'text-signature' : 'text-foreground group-hover:text-signature'}`} />
   );
 };
 

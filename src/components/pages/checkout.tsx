@@ -26,6 +26,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { CopyButton } from "../copy-button";
 import { H5, H6 } from "../typography";
+import Image from "next/image";
+import { MdOutlineAddHomeWork } from "react-icons/md";
+import { FaMoneyBillTransfer, FaUser, FaUpload } from "react-icons/fa6";
+import { RiBankLine } from "react-icons/ri";
+import { BsCloudUpload } from "react-icons/bs";
+import { IoClose } from "react-icons/io5";
+import { toast } from "sonner";
 
 const Checkout = () => {
   const dispatch = useAppDispatch();
@@ -85,7 +92,7 @@ const Checkout = () => {
 
   const handleCheckout = () => {
     if (!image) {
-      alert("Please upload a payment screenshot.");
+      toast.error("Please upload a payment screenshot.");
       return;
     }
 
@@ -95,20 +102,29 @@ const Checkout = () => {
     formData.append("coupoun_amount", coupoun_amount.toString());
     formData.append("phone_number", phone);
     formData.append("shipping_address", address);
-    formData.append("products", JSON.stringify(products));
+    
+    // Ensure each product has the required price field
+    const productsWithPrice = products.map(product => ({
+      ...product,
+      price: product.price // Use selling_price as the  price
+    }));
+    
+    formData.append("products", JSON.stringify(productsWithPrice));
     formData.append("image", image);
 
     addToCart(
       { userId: id, data: formData },
       {
-        onSuccess: () => {
-          alert("Order placed successfully!");
+        onSuccess: () => 
+        {
+          toast.success('Order placed successfully!');
+          
           router.push("/orders");
           dispatch(clearCart());
         },
         onError: (error: any) => {
+          toast.error('Something went wrong.');
           console.error("Order Error:", error);
-          alert("Something went wrong.");
         },
       }
     );
@@ -132,16 +148,26 @@ const Checkout = () => {
     });
   };
 
+  const handleRemoveImage = () => {
+    dispatch(attachImage(null));
+  };
+
   return (
     <div className="space-y-6 my-10 px-4 max-w-4xl mx-auto">
-      <H5 className="text-green-500 font-thin">
-        The account details are provided below. Please complete the payment
-        outside the app and don&apos;t forget to take a screenshot. Thank you!
-      </H5>
+      <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+        <H5 className="text-green-600 font-medium flex items-center gap-2">
+          <span className="text-lg">ℹ️</span>
+          The account details are provided below. Please complete the payment
+          outside the app and don&apos;t forget to take a screenshot. Thank you!
+        </H5>
+      </div>
 
       {/* Bank Details */}
       <div className="bg-muted p-6 rounded-xl border border-border space-y-4">
-        <H6 className="font-medium text-muted-foreground">Bank Details</H6>
+        <H6 className="font-medium text-muted-foreground flex items-center gap-2">
+          <RiBankLine size={20} />
+          Bank Details
+        </H6>
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
             <Label className="text-signature">Bank</Label>
@@ -167,7 +193,8 @@ const Checkout = () => {
 
       {/* User Info + Address */}
       <div className="bg-muted p-6 rounded-xl border border-border space-y-4">
-        <H6 className="font-semibold text-muted-foreground flex justify-between items-center">
+        <H6 className="font-semibold text-muted-foreground flex items-center gap-2">
+          <FaUser size={18} />
           Your Information
         </H6>
 
@@ -212,6 +239,7 @@ const Checkout = () => {
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" variant="outline">
+              <MdOutlineAddHomeWork  size={22}/>
               Add new address
             </Button>
           </DialogTrigger>
@@ -249,31 +277,55 @@ const Checkout = () => {
 
       {/* Upload Screenshot */}
       <div className="bg-muted p-6 rounded-xl border border-border space-y-4">
-        <H6 className="font-semibold text-muted-foreground">
-          Upload Screenshot
+        <H6 className="font-semibold text-muted-foreground flex items-center gap-2">
+          <FaUpload size={18} />
+          Upload Payment Screenshot
         </H6>
-        <div className="space-y-3">
-          <Label className="text-signature">Payment Proof (Image)</Label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="file-input file-input-bordered w-full"
-          />
-
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <label 
+              htmlFor="file-upload" 
+              className="flex-1 cursor-pointer"
+            >
+              <div className="border-2 border-dashed border-muted-foreground/30 rounded-lg p-6 hover:border-muted-foreground/50 transition-colors">
+                <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                  <BsCloudUpload size={32} className="text-muted-foreground/70" />
+                  {image ? (
+                    <>
+                      <span className="text-sm font-medium">Click to change image</span>
+                      <span className="text-xs text-green-600">Image selected ✓</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-sm font-medium">Click to upload</span>
+                      <span className="text-xs">PNG, JPG or JPEG (MAX. 2MB)</span>
+                    </>
+                  )}
+                </div>
+              </div>
+              <Input
+                id="file-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </label>
+          </div>
           {image && (
-            <div className="mt-4 space-y-2">
-              <p className="text-sm text-green-600">Preview:</p>
-              <img
+            <div className="relative w-full aspect-video">
+              <Image
                 src={URL.createObjectURL(image)}
                 alt="Payment Screenshot"
-                className="rounded-lg border border-border max-h-64 object-contain"
+                fill
+                className="object-contain rounded-lg"
               />
               <button
-                onClick={() => dispatch(attachImage(null))}
-                className="text-red-600 hover:underline text-sm"
+                onClick={handleRemoveImage}
+                className="absolute top-2 right-2 bg-red-500/90 hover:bg-red-600 text-white px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-1.5 transition-colors"
               >
-                Remove Image
+                <IoClose size={16} />
+                Remove
               </button>
             </div>
           )}
@@ -283,9 +335,10 @@ const Checkout = () => {
       {/* Submit Button */}
       <Button
         onClick={handleCheckout}
-        className="w-full mt-4 bg-green-600 hover:bg-green-700"
+        className="w-full mt-4 bg-green-600 hover:bg-green-700 flex items-center justify-center gap-2 text-white"
         disabled={!image}
       >
+        <FaMoneyBillTransfer size={18} />
         Submit Payment
       </Button>
     </div>

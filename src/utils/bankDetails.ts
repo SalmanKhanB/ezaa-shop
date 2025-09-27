@@ -1,9 +1,9 @@
 import { BankAccount } from "@/types";
 
 const bankDetails: BankAccount = {
-  bank_name: "Bank Al Habib limited",
-  account_title: "EZAASHOP (PRIVATE) LIMITED",
-  account_number: "20060081010023010",
+  bank_name: "Allied bank",
+  account_title: "Aiman fayyaz",
+  account_number: "PK36ABPA0010077801560013",
 };
 
 export default bankDetails;

@@ -4,23 +4,33 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface ProductState {
   categories: any[];
   subCategories: any[];
-  selectedCategoryId: number | null;
-  selectedSubCategoryId: number | null;
+  selectedCategoryId: number;
+  selectedSubCategoryId: number;
   products: any[];
   popularProducts: any[];
   popularProductsLoading: boolean;
   popularProductsError: string | null;
+  // Pagination states
+  categoryPage: number;
+  subcategoryPage: number;
+  productPage: number;
+  productsPerPage: number;
 }
 
 const initialState: ProductState = {
   categories: [],
   subCategories: [],
-  selectedCategoryId: null,
-  selectedSubCategoryId: null,
+  selectedCategoryId: 0,
+  selectedSubCategoryId: 0,
   products: [],
   popularProducts: [],
   popularProductsLoading: false,
   popularProductsError: null,
+  // Pagination initial states
+  categoryPage: 0,
+  subcategoryPage: 0,
+  productPage: 1,
+  productsPerPage: 8,
 };
 
 const productSlice = createSlice({
@@ -51,6 +61,16 @@ const productSlice = createSlice({
     setPopularProductsError: (state, action: PayloadAction<string | null>) => {
       state.popularProductsError = action.payload;
     },
+    // Pagination actions
+    setCategoryPage: (state, action: PayloadAction<number>) => {
+      state.categoryPage = action.payload;
+    },
+    setSubcategoryPage: (state, action: PayloadAction<number>) => {
+      state.subcategoryPage = action.payload;
+    },
+    setProductPage: (state, action: PayloadAction<number>) => {
+      state.productPage = action.payload;
+    },
   },
 });
 
@@ -63,6 +83,9 @@ export const {
   setPopularProducts,
   setPopularProductsLoading,
   setPopularProductsError,
+  setCategoryPage,
+  setSubcategoryPage,
+  setProductPage,
 } = productSlice.actions;
 
 export default productSlice.reducer;

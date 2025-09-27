@@ -98,3 +98,35 @@ export const filterProducts = (
       )
       .then((res) => res.data)
   );
+
+// Get product for public (no userId)
+export const getProductPublic = (productId: number) =>
+  asyncHandler(() =>
+    api.get(`/productNo/${productId}`).then((res) => res.data)
+  );
+
+// Get product detail for public (no userId) - new endpoint
+export const getProductDetailNo = (productId: number) =>
+  asyncHandler(() =>
+    api.get(`/productDetailNo/${productId}`).then((res) => res.data)
+  );
+
+// Get all categories (public)
+export const getCategoriesPublic = () =>
+  asyncHandler(() => api.get("/getCategoryNo").then((res) => res.data));
+
+// Get all subcategories (public)
+export const getSubCategoriesPublic = () =>
+  asyncHandler(() => api.get("/getSubCategoryNo").then((res) => res.data));
+
+// Get subcategories by categoryId (public)
+export const getSubCategoriesByIdPublic = (categoryId: number) =>
+  asyncHandler(() => api.get(`/getSubCategoryNo/${categoryId}`).then((res) => res.data));
+
+// Get products by subCategoryId (public)
+export const getProductsBySubCategoryPublic = (subCategoryId: number) =>
+  asyncHandler(() => api.get(`/productNo/${subCategoryId}`).then((res) => res.data));
+
+// Get popular products (public)
+export const getPopularProductsPublic = () =>
+  asyncHandler(() => api.get("/popularProductNo").then((res) => res.data));

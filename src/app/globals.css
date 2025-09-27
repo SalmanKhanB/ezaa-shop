@@ -123,10 +123,11 @@
   }
 }
 
-
-
-
-
+/* Vertical text writing mode */
+.writing-mode-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
 
 .custom-scrollbar {
   scrollbar-width: thin; /* Firefox */

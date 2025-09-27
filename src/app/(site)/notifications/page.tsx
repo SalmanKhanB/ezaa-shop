@@ -3,7 +3,7 @@ import Notifications from "@/components/pages/notifications";
 
 const NotificationsPage = () => {
   return (
-    <Container title="Notifications">
+    <Container title="Notifications & Earnings">
       <Notifications />
     </Container>
   );

@@ -1,16 +1,14 @@
 "use client";
 
 import { Search } from "lucide-react";
-import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const SearchProducts = () => {
+  const pathname = usePathname();
+  const isActive = pathname === "/search";
+  
   return (
-    <Link
-      href="/search"
-      className="rounded-full bg-muted border-2 size-9 flex items-center justify-center"
-    >
-      <Search className="w-5 h-5" />
-    </Link>
+    <Search className={`w-5 h-5 transition-colors ${isActive ? 'text-signature' : 'text-foreground group-hover:text-signature'}`} />
   );
 };
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
 import { setToken, setUser, setUserId } from "@/lib/store/slices/authSlice";
 import { useUserInfo } from "@/hooks/useAuth";
@@ -18,6 +18,11 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
 
   const [checkedStorage, setCheckedStorage] = useState(false);
   const [hasRedirected, setHasRedirected] = useState(false); // prevent multiple redirects
+
+  const PUBLIC_ROUTES = useMemo(() => [
+    "/", "/about", "/contact-us", "/privacy-policy", "/terms-conditions", 
+    "/categories", "/products", "/search"
+  ], []);
 
   // STEP 1: Check localStorage on mount
   useEffect(() => {
@@ -46,8 +51,9 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
 
     const isAuthenticated = !!token && !!userId;
     const isAuthRoute = pathname?.startsWith("/auth");
+    const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname === route || pathname?.startsWith(route + "/"));
 
-    if (!isAuthenticated && !isAuthRoute) {
+    if (!isAuthenticated && !isAuthRoute && !isPublicRoute) {
       setHasRedirected(true);
       router.replace("/auth/login");
     }
@@ -56,7 +62,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
       setHasRedirected(true);
       router.replace("/");
     }
-  }, [checkedStorage, token, userId, pathname, router, hasRedirected]);
+  }, [checkedStorage, token, userId, pathname, router, hasRedirected, PUBLIC_ROUTES]);
 
   if (!checkedStorage) return null;
 

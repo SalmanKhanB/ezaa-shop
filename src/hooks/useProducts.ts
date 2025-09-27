@@ -7,23 +7,37 @@ import {
   getProduct,
   getProductDetailById,
   getSubCategories,
-  getUserCartInfo
+  getUserCartInfo,
+  getProductPublic,
+  getProductDetailNo,
+  getCategoriesPublic,
+  getSubCategoriesByIdPublic,
+  getSubCategoriesPublic,
+  getProductsBySubCategoryPublic,
+  getPopularProductsPublic
 } from "@/services/productService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // Get all categories
-export const useCategories = () =>
+export const useCategories = (userId?: number) =>
   useQuery({
-    queryKey: ["categories"],
-    queryFn: getCategories,
+    queryKey: ["categories", userId],
+    queryFn: userId ? getCategories : getCategoriesPublic,
   });
 
 // Get subcategories by category ID
-export const useSubCategories = (categoryId: number) =>
+export const useSubCategories = (categoryId: number, userId?: number) =>
   useQuery({
-    queryKey: ["subcategories", categoryId],
-    queryFn: () => getSubCategories(categoryId),
-    enabled: !!categoryId,
+    queryKey: ["subcategories", categoryId, userId],
+    queryFn: userId && userId !== -1 ? () => getSubCategories(categoryId) : () => getSubCategoriesByIdPublic(categoryId),
+    enabled: categoryId >= 0, // Allow 0 for "all subcategories"
+  });
+
+// Get all subcategories
+export const useAllSubCategories = (userId?: number) =>
+  useQuery({
+    queryKey: ["allSubcategories", userId],
+    queryFn: userId && userId !== -1 ? () => getSubCategories(0) : getSubCategoriesPublic,
   });
 
 // Get product detail by detail ID
@@ -82,20 +96,25 @@ export const useAddReview = () => {
   });
 };
 
-// Get product by productId and userId
-export const useProduct = (productId: number, userId: number) =>
-  useQuery({
-    queryKey: ["product", productId, userId],
-    queryFn: () => getProduct(productId, userId),
-    enabled: !!productId && !!userId,
-  });
+// // Get product by productId and userId (or public if not logged in)
+// export const useProduct = (productId: number, userId?: number) =>
+//   useQuery({
+//     queryKey: ["product", productId, userId],
+//     queryFn: userId ? () => getProduct(productId, userId) : () => getProductPublic(productId),
+//     enabled: !!productId,
+//   });
+  export const useProduct = (productId: number, userId?: number) =>
+    useQuery({
+      queryKey: ["product", productId, userId],
+      queryFn: userId && userId !== -1 ? () => getProduct(productId, userId) : () => getProductDetailNo(productId),
+      enabled: !!productId,
+    });
 
-// Get popular products for user
-export const usePopularProducts = (userId: number) =>
+// Get popular products for user (or public if not logged in)
+export const usePopularProducts = (userId?: number) =>
   useQuery({
     queryKey: ["popularProducts", userId],
-    queryFn: () => getPopularProducts(userId),
-    enabled: !!userId,
+    queryFn: userId && userId !== -1 ? () => getPopularProducts(userId) : getPopularProductsPublic,
   });
 
 // Filter products and optionally revalidate product listings
@@ -122,3 +141,19 @@ export const useFilterProducts = () => {
     },
   });
 };
+
+// Add a public product fetcher (no userId)
+export const useProductPublic = (productId: number) =>
+  useQuery({
+    queryKey: ["productPublic", productId],
+    queryFn: () => getProductPublic(productId),
+    enabled: !!productId,
+  });
+
+// Get products by subcategory
+export const useProductsBySubCategory = (subCategoryId: number, userId?: number) =>
+  useQuery({
+    queryKey: ["productsBySubCategory", subCategoryId, userId],
+    queryFn: userId && userId !== -1 ? () => getProduct(subCategoryId, userId) : () => getProductsBySubCategoryPublic(subCategoryId),
+    enabled: !!subCategoryId,
+  });

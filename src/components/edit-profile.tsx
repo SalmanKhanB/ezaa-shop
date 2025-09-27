@@ -42,7 +42,8 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 const EditProfile = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state.auth);
+  const { user, token, userId } = useAppSelector((state) => state.auth);
+  const { pendingReferralCode } = useAppSelector((state) => state.referral);
   const [preview, setPreview] = useState<string | null>(
     user?.image ? getImageUrl(user.image) : null
   );
@@ -91,6 +92,14 @@ const EditProfile = () => {
       setPreview(getImageUrl(user.image) || null);
     }
   }, [user, reset]);
+
+  useEffect(() => {
+    if (!token || !userId) {
+      let loginUrl = "/auth/login";
+      if (pendingReferralCode) loginUrl += `?referralCode=${pendingReferralCode}`;
+      router.replace(loginUrl);
+    }
+  }, [token, userId, pendingReferralCode, router]);
 
   const onSubmit = (data: ProfileFormValues) => {
     const formData = new FormData();

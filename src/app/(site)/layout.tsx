@@ -1,8 +1,7 @@
 import FetchWrapper from "@/components/fetch-wrapper";
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
-import TopNav from "@/components/top-nav";
-
+ 
 const SiteLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <FetchWrapper>

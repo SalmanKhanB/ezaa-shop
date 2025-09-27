@@ -23,7 +23,7 @@ const OrderedItem = ({ item }: { item: UserCart }) => {
       {/* Right side content */}
       <div className="flex-1">
         <h3 className="font-semibold text-lg">{item.product_name}</h3>
-        <p className="text-sm">Price: Rs. {item.price}</p>
+        <p className="text-sm">Price: Rs. {item.selling_price}</p>
         <p className="text-sm">Quantity: {item.quantity}</p>
         {/* <p className="text-sm">Category: {item.category_name}</p> */}
         <p className="text-sm">

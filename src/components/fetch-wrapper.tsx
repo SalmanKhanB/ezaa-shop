@@ -18,6 +18,7 @@ import {
   setSubCategories,
 } from "@/lib/store/slices/productSlice";
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 // Cashback Hooks
 import {
@@ -46,7 +47,11 @@ import {
 } from "@/lib/store/slices/notificationSlice";
 const FetchWrapper = ({ children }: { children: React.ReactNode }) => {
   const dispatch = useAppDispatch();
+  const pathname = usePathname();
   const userId = useAppSelector((state) => state.auth.user?.id) || "";
+  
+  // Don't auto-select on categories page
+  const isCategoriesPage = pathname === '/categories';
 
   // Fetching product-related data
   const { data: categories, isPending } = useCategories();
@@ -81,11 +86,15 @@ const FetchWrapper = ({ children }: { children: React.ReactNode }) => {
       subCategories.data.subCategories.length > 0
     ) {
       dispatch(setSubCategories(subCategories.data.subCategories));
-      dispatch(
-        setSelectedSubCategoryId(subCategories.data.subCategories[0].id)
-      );
+      
+      // Only auto-select first subcategory if NOT on categories page
+      if (!isCategoriesPage) {
+        dispatch(
+          setSelectedSubCategoryId(subCategories.data.subCategories[0].id)
+        );
+      }
     }
-  }, [subCategories, dispatch]);
+  }, [subCategories, dispatch, isCategoriesPage]);
 
   useEffect(() => {
     if (products) {

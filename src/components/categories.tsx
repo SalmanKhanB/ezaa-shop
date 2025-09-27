@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { H3 } from "@/components/typography";
 import {
@@ -10,16 +10,18 @@ import {
 } from "@/components/ui/carousel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCategories } from "@/hooks/useProducts";
-import { useAppSelector } from "@/lib/store/hooks";
-import { setSelectedCategoryId } from "@/lib/store/slices/productSlice";
+import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
+import { setSelectedCategoryId, setCategoryPage } from "@/lib/store/slices/productSlice";
 import { Category } from "@/types";
-import { useDispatch } from "react-redux";
 import MyImage from "./my-image";
+import Link from "next/link";
+import CategoryCard from "./category-card";
 
 const Categories = () => {
   const { data: categories, isLoading, isError, error } = useCategories();
-  const { selectedCategoryId } = useAppSelector((store) => store.product);
-  const dispatch = useDispatch();
+  const { selectedCategoryId, categoryPage } = useAppSelector((store) => store.product);
+  const dispatch = useAppDispatch();
+  const [carouselApi, setCarouselApi] = useState<any>(null);
 
   // Toast on error
   useEffect(() => {
@@ -28,6 +30,55 @@ const Categories = () => {
       toast.error("Failed to load categories.");
     }
   }, [isError, error]);
+
+  // Auto-select first category if none selected
+  useEffect(() => {
+    if (categories?.data?.categories?.length && selectedCategoryId === 0) {
+      dispatch(setSelectedCategoryId(categories.data.categories[0].id));
+    }
+  }, [categories, selectedCategoryId, dispatch]);
+
+  // Handle carousel API
+  useEffect(() => {
+    if (!carouselApi) return;
+    
+    const onSelect = () => {
+      const currentSlide = carouselApi.selectedScrollSnap();
+      const itemsPerPage = 4;
+      const currentPage = Math.floor(currentSlide / itemsPerPage);
+      console.log('Carousel slide changed:', { currentSlide, currentPage, itemsPerPage });
+      dispatch(setCategoryPage(currentPage));
+    };
+    
+    const onScroll = () => {
+      const currentSlide = carouselApi.selectedScrollSnap();
+      const itemsPerPage = 4;
+      const currentPage = Math.floor(currentSlide / itemsPerPage);
+      console.log('Carousel scroll:', { currentSlide, currentPage, itemsPerPage });
+      dispatch(setCategoryPage(currentPage));
+    };
+    
+    carouselApi.on("select", onSelect);
+    carouselApi.on("scroll", onScroll);
+    
+    // Set initial page
+    onSelect();
+    
+    return () => {
+      carouselApi.off("select", onSelect);
+      carouselApi.off("scroll", onScroll);
+    };
+  }, [carouselApi, dispatch]);
+
+  // Navigate to specific page
+  const goToPage = (page: number) => {
+    if (carouselApi) {
+      const itemsPerPage = 4;
+      const targetSlide = page * itemsPerPage;
+      carouselApi.scrollTo(targetSlide);
+      dispatch(setCategoryPage(page));
+    }
+  };
 
   // Show loading skeletons
   if (isLoading) return <CategoriesSkeleton />;
@@ -47,43 +98,49 @@ const Categories = () => {
   // Main content
   return (
     <div className="my-8">
-      <H3 className="text-center mb-6">Categories</H3>
+      <div className="flex items-center justify-between mb-6">
+        <H3 className="text-left text-foreground text-sm font-medium">CATEGORY</H3>
+        <Link href="/categories" className="text-red-600 font-medium text-sm hover:underline">View All</Link>
+      </div>
       <Carousel
+        setApi={setCarouselApi}
         opts={{
           align: "start",
-          dragFree: true,
+          dragFree: false, // Disable dragFree to ensure proper snap behavior
+          slidesToScroll: 4, // Scroll 4 items at a time (one page)
+          containScroll: "trimSnaps", // Ensure proper snapping
         }}
         className="w-full"
       >
-        <CarouselContent className="-ml-2">
+        <CarouselContent className="px-3">
           {categories.data.categories.map((category: Category) => (
             <CarouselItem
               key={category.id}
-              onClick={() => dispatch(setSelectedCategoryId(category.id))}
-              className="pl-3 basis-auto w-32 cursor-pointer "
+              className="basis-auto w-32"
             >
-              <div
-                className={`flex flex-col items-center gap-2 rounded-xl overflow-hidden p-4 transition-colors duration-200 shadow ${
-                  selectedCategoryId == category.id
-                    ? "bg-signature/20"
-                    : ""
-                }`}
-              >
-                <MyImage
-                  src={category.image}
-                  alt={category.name}
-                  width={80}
-                  height={80}
-                  className="w-full h-20 object-cover rounded-md transition-transform hover:scale-105"
-                />
-                <span className="text-xs font-medium text-center text-foreground line-clamp-1">
-                  {category.name}
-                </span>
-              </div>
+              <CategoryCard
+                category={category}
+                isSelected={selectedCategoryId === category.id}
+                onClick={() => dispatch(setSelectedCategoryId(category.id))}
+              />
             </CarouselItem>
           ))}
         </CarouselContent>
       </Carousel>
+      {/* Navigation dots */}
+      <div className="flex justify-center gap-2 mt-4">
+        {Array.from({ length: Math.ceil(categories.data.categories.length / 4) }).map((_, index) => (
+          <button
+            key={index}
+            onClick={() => goToPage(index)}
+            className={`h-2 rounded-full transition-all duration-300 ${
+              categoryPage === index 
+              ? "bg-primary w-8" // Active dot: theme-aware primary color, 220% wider (2.2x)
+              : "bg-muted-foreground w-2" // Inactive dots: theme-aware muted color, normal width
+              }`}
+          />
+        ))}
+      </div>
     </div>
   );
 };

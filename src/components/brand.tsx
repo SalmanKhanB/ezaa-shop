@@ -8,16 +8,16 @@ const Brand = () => {
         className="md:hidden"
         src="/images/logo.png"
         alt="Ezaa Shop"
-        width={60}
-        height={60}
+        width={52}
+        height={52}
         hasBaseUrl={false}
       />
       <MyImage
         className="hidden md:block"
         src="/images/logo.png"
         alt="Ezaa Shop"
-        width={80}
-        height={80}
+        width={50}
+        height={50}
         hasBaseUrl={false}
       />
     </Link>

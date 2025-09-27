@@ -7,6 +7,7 @@ import { Product } from "@/types";
 import { useState } from "react";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const Favorite = ({
   product,
@@ -18,14 +19,21 @@ const Favorite = ({
   const { id, product_image, name, product_deatils } = product;
 
   const dispatch = useAppDispatch();
-  const { userId } = useAppSelector((store) => store.auth);
+  const { token, userId } = useAppSelector((store) => store.auth);
   const { favorites } = useAppSelector((store) => store.favorite) || {};
+  const { pendingReferralCode } = useAppSelector((store) => store.referral);
+  const router = useRouter();
   const isFavorite = favorites.some((favorite) => favorite.products.id === id);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const toggleFavorite = () => {
-    if (!userId || isSubmitting) return; // prevent unauthorized or double-click
-
+    if (!token || !userId) {
+      let loginUrl = "/auth/login";
+      if (pendingReferralCode) loginUrl += `?referralCode=${pendingReferralCode}`;
+      router.push(loginUrl);
+      return;
+    }
+    if (isSubmitting) return;
     setIsSubmitting(true);
 
     const favoriteProductData = {

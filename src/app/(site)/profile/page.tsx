@@ -1,12 +1,13 @@
+"use client";
 import Container from "@/components/container";
-import Profile from "@/components/pages/profile";
+import EditProfile from "@/components/edit-profile";
 
-const ProfilePage = () => {
+const EditProfilePage = () => {
   return (
-    <Container title="Profile">
-      <Profile />
+    <Container title="Edit Profile">
+      <EditProfile />
     </Container>
   );
 };
 
-export default ProfilePage;
+export default EditProfilePage;
